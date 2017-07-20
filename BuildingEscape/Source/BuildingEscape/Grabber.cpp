@@ -4,7 +4,9 @@
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/Actor.h"
 #include "Components/ActorComponent.h"
+#include "CollisionQueryParams.h"
 
 #define OUT // An annotation to remind "OUT" functionality in code
 
@@ -19,7 +21,7 @@ UGrabber::UGrabber()
 }
 
 
-// Called when the game starts
+/// Called when the game starts
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
@@ -29,25 +31,18 @@ void UGrabber::BeginPlay()
 }
 
 
-// Called every frame
+/// Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// Get player viewpoint this tick
+	/// Get player viewpoint this tick
 	FVector PlayerViewPointLocation;
 	FRotator PlayerViewPointRotation;
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
 		OUT PlayerViewPointLocation,
 		OUT PlayerViewPointRotation
 	);
-
-
-	// TODO Log out to test
-	/*UE_LOG(LogTemp, Warning, TEXT("Location: %s, Rotation: %s"), 
-		*PlayerViewPointLocation.ToString(), 
-		*PlayerViewPointRotation.ToString()
-	)*/
 
 	FVector LineTraceEnd = PlayerViewPointLocation + 
 		PlayerViewPointRotation.Vector() * Reach;
@@ -64,10 +59,25 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		10.f
 	);
 
-	// Ray-cast out to reach distance
+	/// Setup query parameters
+	FCollisionQueryParams TraceParameters(FName(TEXT("")), false, GetOwner());
 
+	/// Line-trace (AKA Ray-cast) out to reach distance
+	FHitResult Hit;
+	GetWorld()->LineTraceSingleByObjectType(
+		OUT Hit,
+		PlayerViewPointLocation,
+		LineTraceEnd,
+		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+		TraceParameters
+	);
 
-	// See what we hit
-
+	/// See what we hit
+	AActor* HitObject = Hit.GetActor();
+	if (HitObject)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hit %s"), *(HitObject->GetName()))
+	}
+	
 }
 
