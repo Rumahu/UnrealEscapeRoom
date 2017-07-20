@@ -10,7 +10,7 @@
 
 #define OUT // An annotation to remind "OUT" functionality in code
 
-// Sets default values for this component's properties
+/// Sets default values for this component's properties
 UGrabber::UGrabber()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
@@ -28,6 +28,16 @@ void UGrabber::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("Grabber reporting for duty!"));
 	
+	/// Look for attached Physics Handle
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (PhysicsHandle)
+	{
+		// Physics handle is found
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Was unable to find Physics Handle in %s"), *GetOwner()->GetName())
+	}
 }
 
 
