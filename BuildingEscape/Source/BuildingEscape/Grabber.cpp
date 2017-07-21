@@ -32,14 +32,31 @@ void UGrabber::BeginPlay()
 	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 	if (PhysicsHandle)
 	{
-		// Physics handle is found
+		UE_LOG(LogTemp, Warning, TEXT("Physics Handle found for %s"), *GetOwner()->GetName())
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Was unable to find Physics Handle in %s"), *GetOwner()->GetName())
+		UE_LOG(LogTemp, Error, TEXT("Was unable to find Physics Handle for %s"), *GetOwner()->GetName())
+	}
+
+	/// Look for attached Input Component (at run time)
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (InputComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Input Component found for %s"), *GetOwner()->GetName())
+			/// Bind the input axis
+			InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Was unable to find Input Component for %s"), *GetOwner()->GetName())
 	}
 }
 
+void UGrabber::Grab() 
+{
+	UE_LOG(LogTemp, Warning, TEXT("Grab activated"))
+}
 
 /// Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
