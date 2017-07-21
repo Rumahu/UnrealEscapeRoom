@@ -2,6 +2,7 @@
 
 #include "OpenDoor.h"
 #include "BuildingEscape.h"
+#include "Components/PrimitiveComponent.h"
 #include <GameFramework/Actor.h>
 
 #define OUT
@@ -59,12 +60,21 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 float UOpenDoor::GetTotalMassOnPlate() 
 {
 	float TotalMass = 0.f;
-	
+
 	// Find all overlapping actors
 	TArray<AActor*> OverlappingActors;
 	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
 
+	FString ActorNames = "";
+
 	// Iterate through them and adding their masses
-	
+	for (const auto* Actor: OverlappingActors)
+	{
+		ActorNames = ActorNames + Actor->GetName() + " ";
+		TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("%s on plate"), *ActorNames)
+
 	return TotalMass;
 }
